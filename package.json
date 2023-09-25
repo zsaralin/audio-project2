@@ -1,0 +1,25 @@
+{
+  "name": "audioproject",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd audio-app/backend && node index.js",
+    "client": "cd audio-app/src && npm start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tensorflow-models/speech-commands": "^0.5.4",
+    "cors": "^2.8.5",
+    "react-speech-recognition": "^3.10.0",
+    "react-use-clipboard": "^1.0.9",
+    "recorder-js": "^1.0.7",
+    "rhymes": "^2.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.1"
+  }
+}
