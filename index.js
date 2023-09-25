@@ -7,22 +7,15 @@ require("dotenv").config();
 const app = express();
 const port =  process.env.PORT || 4000;
 
-// Configure CORS to allow requests from a specific frontend domain
-const corsOptions = {
-    origin: 'https://speech-to-text-z027.onrender.com',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true, // If you're using cookies or sessions
-};
-
 // Use the 'cors' middleware to enable CORS for all routes
-app.use(cors(corsOptions));
+app.use(cors());
 
 app.use(bodyParser.json());
 
 const openai = new OpenAI({
-    apiKey: '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' // This is also the default, can be omitted
+    apiKey: process.env.OPENAI_API_KEY // This is also the default, can be omitted
 });
-app.post('https://speech-to-text-back.onrender.com/api/save-note', async (req, res) => {
+app.post('/api/save-note', async (req, res) => {
     const {note} = req.body;
 
     // Here, you can save the 'note' to your desired storage or perform any other action.
