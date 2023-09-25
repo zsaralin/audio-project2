@@ -25,7 +25,7 @@ async function createRhyme(note) {
     try {
         const completion = await openai.completions.create({
             model: "text-davinci-003",
-            prompt : `create a phrase of similar length that rhymes with the following phrase: ${note}`,
+            prompt : `create a phrase of rhymes with the: ${note}`,
             max_tokens: 90,
         });
         console.log(completion.choices[0].text);
@@ -100,3 +100,4 @@ async function createSong(note) {
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
+
