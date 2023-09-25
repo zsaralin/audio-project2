@@ -54,12 +54,14 @@ async function createPoem(note) {
     }
 }
 app.post('/api/haiku', async (req, res) => {
-    const {note} = req.body;
+    const { note } = req.body;
     const ans = await createHaiku(note);
-    const finalAns =
-    console.log('Received note from the frontend:', ans);
-    res.json({message: 'Note saved successfully on the backend.', generatedText: JSON.stringify(ans, (key, value) =>
-            typeof value === 'string' ? value.replace(/\n/g, '\\n') : value),});
+    const formattedText = ans.replace(/\\n/g, '\n');
+    console.log('Received note from the frontend:', formattedText);
+    res.json({
+        message: 'Note saved successfully on the backend.',
+        generatedText: formattedText,
+    });
 });
 async function createHaiku(note) {
     try {
