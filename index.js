@@ -15,25 +15,74 @@ app.use(bodyParser.json());
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY // This is also the default, can be omitted
 });
-app.post('/api/save-note', async (req, res) => {
+app.post('/api/rhyme', async (req, res) => {
     const {note} = req.body;
-
-    // Here, you can save the 'note' to your desired storage or perform any other action.
-    // For example, you can save it to a database.
-    // Replace this with your actual logic.
-    const ans = await runCompletion(note);
-
-    // Log the result
+    const ans = await createRhyme(note);
     console.log('Received note from the frontend:', ans);
-
-    // Respond with the result in the JSON response
     res.json({message: 'Note saved successfully on the backend.', generatedText: ans});
 });
-async function runCompletion(note) {
+async function createRhyme(note) {
     try {
         const completion = await openai.completions.create({
             model: "text-davinci-003",
-            prompt : `create 3 phrases of similar length that rhyme with the following: ${note}`,
+            prompt : `create a phrases of similar length that at least rhymes with the end of the following phrase. be creative: ${note}`,
+            max_tokens: 90,
+        });
+        console.log(completion.choices[0].text);
+        return completion.choices[0].text
+    } catch (error) {
+        console.error("Error:", error.message);
+    }
+}
+app.post('/api/poem', async (req, res) => {
+    const {note} = req.body;
+    const ans = await createPoem(note);
+    console.log('Received note from the frontend:', ans);
+    res.json({message: 'Note saved successfully on the backend.', generatedText: ans});
+});
+async function createPoem(note) {
+    try {
+        const completion = await openai.completions.create({
+            model: "text-davinci-003",
+            prompt : `create a short poem that rhymes with the following phrase: ${note}`,
+            max_tokens: 90,
+        });
+        console.log(completion.choices[0].text);
+        return completion.choices[0].text
+    } catch (error) {
+        console.error("Error:", error.message);
+    }
+}
+app.post('/api/haiku', async (req, res) => {
+    const {note} = req.body;
+    const ans = await createHaiku(note);
+    console.log('Received note from the frontend:', ans);
+    res.json({message: 'Note saved successfully on the backend.', generatedText: ans});
+});
+async function createHaiku(note) {
+    try {
+        const completion = await openai.completions.create({
+            model: "text-davinci-003",
+            prompt : `create a haiku that uses the following phrase or parts of it: ${note}`,
+            max_tokens: 90,
+        });
+        console.log(completion.choices[0].text);
+        return completion.choices[0].text
+    } catch (error) {
+        console.error("Error:", error.message);
+    }
+}
+app.post('/api/song', async (req, res) => {
+    const {note} = req.body;
+    const ans = await createSong(note);
+    console.log('Received note from the frontend:', ans);
+    res.json({message: 'Note saved successfully on the backend.', generatedText: ans});
+});
+async function createSong(note) {
+    try {
+        const completion = await openai.completions.create({
+            model: "text-davinci-003",
+            prompt : `create a song verse from the following phrase: ${note}`,
             max_tokens: 90,
         });
         console.log(completion.choices[0].text);
@@ -45,4 +94,3 @@ async function runCompletion(note) {
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
-// runCompletion();
