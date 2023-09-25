@@ -21,13 +21,13 @@ app.post('/api/save-note', async (req, res) => {
     // Here, you can save the 'note' to your desired storage or perform any other action.
     // For example, you can save it to a database.
     // Replace this with your actual logic.
-    // const ans = await runCompletion(note);
+    const ans = await runCompletion(note);
 
     // Log the result
-    console.log('Received note from the frontend:', note);
+    console.log('Received note from the frontend:', ans);
 
     // Respond with the result in the JSON response
-    res.json({message: 'Note saved successfully on the backend.', generatedText: note});
+    res.json({message: 'Note saved successfully on the backend.', generatedText: ans});
 });
 async function runCompletion(note) {
     try {
