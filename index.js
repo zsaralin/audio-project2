@@ -25,7 +25,7 @@ async function createRhyme(note) {
     try {
         const completion = await openai.completions.create({
             model: "text-davinci-003",
-            prompt : `create a phrases of similar length that at least rhymes with the end of the following phrase. be creative: ${note}`,
+            prompt : `create a phrase of similar length rhymes with the end of the following phrase: ${note}`,
             max_tokens: 90,
         });
         console.log(completion.choices[0].text);
@@ -45,7 +45,7 @@ async function createPoem(note) {
         const completion = await openai.completions.create({
             model: "text-davinci-003",
             prompt : `create a short poem that rhymes with the following phrase: ${note}`,
-            max_tokens: 90,
+            max_tokens: 150,
         });
         console.log(completion.choices[0].text);
         return completion.choices[0].text
@@ -56,15 +56,17 @@ async function createPoem(note) {
 app.post('/api/haiku', async (req, res) => {
     const {note} = req.body;
     const ans = await createHaiku(note);
+    const finalAns =
     console.log('Received note from the frontend:', ans);
-    res.json({message: 'Note saved successfully on the backend.', generatedText: ans});
+    res.json({message: 'Note saved successfully on the backend.', generatedText: JSON.stringify(ans, (key, value) =>
+            typeof value === 'string' ? value.replace(/\n/g, '\\n') : value),});
 });
 async function createHaiku(note) {
     try {
         const completion = await openai.completions.create({
             model: "text-davinci-003",
             prompt : `create a haiku that uses the following phrase or parts of it: ${note}`,
-            max_tokens: 90,
+            max_tokens: 150,
         });
         console.log(completion.choices[0].text);
         return completion.choices[0].text
@@ -82,8 +84,8 @@ async function createSong(note) {
     try {
         const completion = await openai.completions.create({
             model: "text-davinci-003",
-            prompt : `create a song verse from the following phrase: ${note}`,
-            max_tokens: 90,
+            prompt : `create a song verse from the following phrase. don't write verse just begin the song: ${note}`,
+            max_tokens: 150,
         });
         console.log(completion.choices[0].text);
         return completion.choices[0].text
