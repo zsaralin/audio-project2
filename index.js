@@ -25,7 +25,7 @@ async function createRhyme(note) {
     try {
         const completion = await openai.completions.create({
             model: "text-davinci-003",
-            prompt : `create a phrase of similar length rhymes with the end of the following phrase: ${note}`,
+            prompt : `create a phrase of similar length that rhymes with the end of the following phrase. make sure to use a different word: ${note}`,
             max_tokens: 90,
         });
         console.log(completion.choices[0].text);
@@ -37,8 +37,9 @@ async function createRhyme(note) {
 app.post('/api/poem', async (req, res) => {
     const {note} = req.body;
     const ans = await createPoem(note);
-    console.log('Received note from the frontend:', ans);
-    res.json({message: 'Note saved successfully on the backend.', generatedText: ans});
+    const formattedText = ans.replace(/\\n/g, '\n');
+    console.log('Received note from the frontend:', formattedText);
+    res.json({message: 'Note saved successfully on the backend.', generatedText: formattedText});
 });
 async function createPoem(note) {
     try {
@@ -79,14 +80,15 @@ async function createHaiku(note) {
 app.post('/api/song', async (req, res) => {
     const {note} = req.body;
     const ans = await createSong(note);
-    console.log('Received note from the frontend:', ans);
-    res.json({message: 'Note saved successfully on the backend.', generatedText: ans});
+    const formattedText = ans.replace(/\\n/g, '\n');
+    console.log('Received note from the frontend:', formattedText);
+    res.json({message: 'Note saved successfully on the backend.', generatedText: formattedText});
 });
 async function createSong(note) {
     try {
         const completion = await openai.completions.create({
             model: "text-davinci-003",
-            prompt : `create a song verse from the following phrase. don't write verse just begin the song: ${note}`,
+            prompt : `create a song verse from the following phrase. don't write verse or verse:, please just begin the song: ${note}`,
             max_tokens: 150,
         });
         console.log(completion.choices[0].text);
