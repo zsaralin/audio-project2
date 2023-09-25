@@ -22,7 +22,7 @@ app.use(bodyParser.json());
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY // This is also the default, can be omitted
 });
-app.post('https://speech-to-text-back.onrender.com/api/save-note', async (req, res) => {
+app.post('/api/save-note', async (req, res) => {
     const {note} = req.body;
 
     // Here, you can save the 'note' to your desired storage or perform any other action.
