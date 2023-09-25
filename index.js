@@ -28,13 +28,13 @@ app.post('https://speech-to-text-back.onrender.com/api/save-note', async (req, r
     // Here, you can save the 'note' to your desired storage or perform any other action.
     // For example, you can save it to a database.
     // Replace this with your actual logic.
-    const ans = await note//runCompletion(note);
+    // const ans = await runCompletion(note);
 
     // Log the result
-    console.log('Received note from the frontend:', ans);
+    console.log('Received note from the frontend:', note);
 
     // Respond with the result in the JSON response
-    res.json({message: 'Note saved successfully on the backend.', generatedText: ans});
+    res.json({message: 'Note saved successfully on the backend.', generatedText: note});
 });
 async function runCompletion(note) {
     try {
