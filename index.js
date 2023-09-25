@@ -25,7 +25,7 @@ async function createRhyme(note) {
     try {
         const completion = await openai.completions.create({
             model: "text-davinci-003",
-            prompt : `create a phrase of similar length that rhymes with the end of the following phrase. make sure to use a different word: ${note}`,
+            prompt : `create a phrase of similar length that rhymes with the following phrase: ${note}`,
             max_tokens: 90,
         });
         console.log(completion.choices[0].text);
