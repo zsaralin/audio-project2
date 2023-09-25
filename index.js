@@ -7,8 +7,15 @@ require("dotenv").config();
 const app = express();
 const port =  process.env.PORT || 4000;
 
+// Configure CORS to allow requests from a specific frontend domain
+const corsOptions = {
+    origin: 'https://speech-to-text-z027.onrender.com',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true, // If you're using cookies or sessions
+};
+
 // Use the 'cors' middleware to enable CORS for all routes
-app.use(cors());
+app.use(cors(corsOptions));
 
 app.use(bodyParser.json());
 
