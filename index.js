@@ -20,7 +20,7 @@ app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY // This is also the default, can be omitted
+    apiKey: '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' // This is also the default, can be omitted
 });
 app.post('https://speech-to-text-back.onrender.com/api/save-note', async (req, res) => {
     const {note} = req.body;
