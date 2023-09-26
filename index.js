@@ -18,7 +18,7 @@ const storage = multer.diskStorage({
         cb(null, 'uploads/'); // Save files to the 'uploads' folder
     },
     filename: (req, file, cb) => {
-        cb(null, 'audio.mp3'); // Specify the file name
+        cb(null, 'audio.wav'); // Specify the file name
     },
 });
 const upload = multer({ storage });
@@ -125,9 +125,10 @@ app.post('/api/whisper',upload.single('audioFile'), async (req, res) => {
 });
 async function whisper(audioFilePath) {
     try {
+        console.log('EHYYYYYY ' + audioFilePath)
         const response = await openai.audio.transcriptions.create({
             model: 'whisper-1',
-            file: fs.createReadStream(path.join(__dirname, '/uploads/audio.mp3'))
+            file: fs.createReadStream(path.join(__dirname, '/uploads/audio.wav'))
         });
 
         // Access the transcription from the response
