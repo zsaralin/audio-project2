@@ -3,9 +3,13 @@ const readlineSync = require("readline-sync");
 const bodyParser = require('body-parser');
 const cors = require('cors'); // Import the 'cors' middleware
 const express = require('express')
+const fs = require("fs");
 require("dotenv").config();
+const multer = require('multer');
+
 const app = express();
 const port =  process.env.PORT || 4000;
+const upload = multer({ dest: 'uploads/' }); // Specify the destination directory for file uploads
 
 // Use the 'cors' middleware to enable CORS for all routes
 app.use(cors());
@@ -25,7 +29,7 @@ async function createRhyme(note) {
     try {
         const completion = await openai.completions.create({
             model: "text-davinci-003",
-            prompt : `create a phrase that rhymes with: ${note}`,
+            prompt : `create a phrase that rhymes with the following. don't put quotations around it: ${note}`,
             max_tokens: 90,
         });
         console.log(completion.choices[0].text);
@@ -95,6 +99,34 @@ async function createSong(note) {
         return completion.choices[0].text
     } catch (error) {
         console.error("Error:", error.message);
+    }
+}
+app.post('/api/whisper', upload.single('audioFile'), async (req, res) => {
+    try {
+        const { path: audioFilePath } = req.file; // Get the path to the uploaded audio file
+        const ans = await whisper(audioFilePath);
+        console.log('Received note from the frontend:', ans);
+        res.json({ message: 'Note saved successfully on the backend.', generatedText: ans });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+async function whisper(audioFilePath) {
+    try {
+        const response = await openai.audio.transcriptions.create({
+            model: 'whisper-1',
+            file: fs.createReadStream(audioFilePath),
+        });
+
+        // Access the transcription from the response
+        const transcription = response.text;
+
+        // Log the transcription to the console
+        console.log('Transcription:', transcription);
+        return transcription
+    } catch (error) {
+        console.error('Error:', error);
     }
 }
 app.listen(port, () => {
