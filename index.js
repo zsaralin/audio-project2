@@ -18,7 +18,7 @@ const storage = multer.diskStorage({
         cb(null, 'uploads/'); // Save files to the 'uploads' folder
     },
     filename: (req, file, cb) => {
-        cb(null, 'audio.wav'); // Specify the file name
+        cb(null, 'audio.mp3'); // Specify the file name
     },
 });
 const upload = multer({ storage });
@@ -113,19 +113,14 @@ async function createSong(note) {
         console.error("Error:", error.message);
     }
 }
-app.post('/api/whisper',async (req, res) => {
-
+app.post('/api/whisper',upload.single('audioFile'), async (req, res) => {
     if (!req.file) {
         console.log('hiiiiiiiiiiiiiiii')
-
         return res.status(400).json({ error: 'No file uploaded.' });
         }
-        const tempFilePath = path.join(__dirname, 'temp', 'audio.mp3'); // Change the path as needed
-        await fs.rename(req.file.path, tempFilePath);
 
-        const ans = await whisper(tempFilePath);
+        const ans = await whisper(req.file);
         console.log('Received note from the frontend:', ans);
-        await fs.unlink(tempFilePath);
 
         res.json({ message: 'Note saved successfully on the backend.', generatedText: ans });
 });
