@@ -113,7 +113,7 @@ async function createSong(note) {
         console.error("Error:", error.message);
     }
 }
-app.post('/api/whisper', upload.single('audioFile'),async (req, res) => {
+app.post('/api/whisper',async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded.' });
