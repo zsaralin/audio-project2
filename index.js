@@ -128,7 +128,7 @@ async function whisper(audioFilePath) {
         console.log('EHYYYYYY ' + audioFilePath)
         const response = await openai.audio.transcriptions.create({
             model: 'whisper-1',
-            file: fs.createReadStream(audioFilePath)
+            file: fs.createReadStream('./'+audioFilePath)
         });
 
         // Access the transcription from the response
