@@ -6,6 +6,7 @@ const express = require('express')
 const fs = require("fs");
 require("dotenv").config();
 const multer = require('multer');
+const path = require('path');
 
 const app = express();
 const port =  process.env.PORT || 4000;
@@ -13,7 +14,7 @@ const port =  process.env.PORT || 4000;
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         // Specify the directory where uploaded files should be stored on disk
-        cb(null, 'uploads/'); // You can change the directory as needed
+        cb(null, './uploads/'); // You can change the directory as needed
     },
     filename: function (req, file, cb) {
         // Define how uploaded files should be named
