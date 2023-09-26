@@ -8,7 +8,8 @@ require("dotenv").config();
 const tmp = require('tmp');
 const path = require('path');
 const multer = require("multer");
-
+const base64 = require('base-64');
+const ffmpeg = require('fluent-ffmpeg');
 const app = express();
 const port =  process.env.PORT || 4000;
 // Set up a storage strategy for multer
@@ -113,16 +114,53 @@ async function createSong(note) {
         console.error("Error:", error.message);
     }
 }
-app.post('/api/whisper',upload.single('audioFile'), async (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ error: 'No file uploaded.' });
-        }
+// app.post('/api/whisper',upload.single('audioFile'), async (req, res) => {
+//     if (!req.file) {
+//         return res.status(400).json({ error: 'No file uploaded.' });
+//         }
+//
+//         const ans = await whisper(req.file.path);
+//         console.log('Received note from the frontend:', ans);
+//
+//         res.json({ message: 'Note saved successfully on the backend.', generatedText: ans });
+// });
+app.post('/api/whisper', (req, res) => {
+    try {
+        const { audioFile } = req.body;
+        // Decode the base64-encoded audio data
+        const decodedAudio = base64.decode(audioFile);
 
-        const ans = await whisper(req.file.path);
-        console.log('Received note from the frontend:', ans);
+        // Use FFmpeg to convert the decoded audio data to MP3
+        ffmpeg()
+            .input(decodedAudio)
+            .inputFormat('wav') // Assuming the input is in WAV format
+            .audioCodec('libmp3lame')
+            .audioBitrate(192)
+            .audioChannels(2)
+            .audioFrequency(44100)
+            .toFormat('mp3')
+            .on('end', async () => {
+                console.log('Conversion finished.');
+                // Now that the audio is converted, get the path to the MP3 file
+                const mp3FilePath = 'uploads/audio.mp3';
 
-        res.json({ message: 'Note saved successfully on the backend.', generatedText: ans });
+                // Call the 'whisper' function with the file path
+                const ans = await whisper(mp3FilePath);
+
+                res.status(200).json({message: 'Audio received, converted to MP3, and processed by whisper.', ans});
+            })
+            .on('error', (err) => {
+                console.error('Error:', err);
+                res.status(500).json({ error: 'Audio conversion error' });
+            })
+            .pipe(fs.createWriteStream('path/to/new_file.mp3'));
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 });
+
+
 async function whisper(audioFilePath) {
     try {
         console.log('EHYYYYYY ' + audioFilePath)
