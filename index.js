@@ -118,7 +118,7 @@ app.post('/api/whisper',upload.single('audioFile'), async (req, res) => {
         return res.status(400).json({ error: 'No file uploaded.' });
         }
 
-        const ans = await whisper(req.file);
+        const ans = await whisper(req.file.path);
         console.log('Received note from the frontend:', ans);
 
         res.json({ message: 'Note saved successfully on the backend.', generatedText: ans });
@@ -128,7 +128,7 @@ async function whisper(audioFilePath) {
         console.log('EHYYYYYY ' + audioFilePath)
         const response = await openai.audio.transcriptions.create({
             model: 'whisper-1',
-            file: fs.createReadStream(path.join(__dirname, '/uploads/audio.wav'))
+            file: fs.createReadStream(audioFilePath)
         });
 
         // Access the transcription from the response
