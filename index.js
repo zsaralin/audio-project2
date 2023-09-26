@@ -128,7 +128,7 @@ app.post('/api/whisper', (req, res) => {
     try {
         const { audioFile } = req.body;
         // Decode the base64-encoded audio data
-        const decodedAudio = base64.decode(audioFile);
+        const decodedAudio = Buffer.from(audioFile, 'base64');
 
         // Use FFmpeg to convert the decoded audio data to MP3
         ffmpeg()
