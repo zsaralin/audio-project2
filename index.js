@@ -5,24 +5,11 @@ const cors = require('cors'); // Import the 'cors' middleware
 const express = require('express')
 const fs = require("fs");
 require("dotenv").config();
-const tmp = require('tmp');
 const path = require('path');
-const multer = require("multer");
-const base64 = require('base-64');
-const ffmpeg = require('fluent-ffmpeg');
 const app = express();
 const port =  process.env.PORT || 4000;
 // Set up a storage strategy for multer
 // Configure Multer to save uploaded files to a specific folder
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/'); // Save files to the 'uploads' folder
-    },
-    filename: (req, file, cb) => {
-        cb(null, 'audio.wav'); // Specify the file name
-    },
-});
-const upload = multer({ storage });
 
 // Use the 'cors' middleware to enable CORS for all routes
 app.use(cors());
