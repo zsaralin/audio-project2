@@ -101,3 +101,8 @@ async function createSong(note) {
         console.error("Error:", error.message);
     }
 }
+
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+});
+
