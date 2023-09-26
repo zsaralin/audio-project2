@@ -114,7 +114,6 @@ async function createSong(note) {
     }
 }
 app.post('/api/whisper',async (req, res) => {
-    try {
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded.' });
         }
@@ -127,11 +126,6 @@ app.post('/api/whisper',async (req, res) => {
         await fs.unlink(tempFilePath);
 
         res.json({ message: 'Note saved successfully on the backend.', generatedText: ans });
-
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
 });
 async function whisper(audioFilePath) {
     try {
