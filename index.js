@@ -9,7 +9,9 @@ const multer = require('multer');
 
 const app = express();
 const port =  process.env.PORT || 4000;
-const upload = multer({ dest: 'uploads/' }); // Specify the destination directory for file uploads
+// Set up a storage strategy for multer
+const storage = multer.memoryStorage(); // Store the file in memory
+const upload = multer({ storage: storage });
 
 // Use the 'cors' middleware to enable CORS for all routes
 app.use(cors());
@@ -103,8 +105,11 @@ async function createSong(note) {
 }
 app.post('/api/whisper', upload.single('audioFile'), async (req, res) => {
     try {
-        const { path: audioFilePath } = req.file; // Get the path to the uploaded audio file
-        const ans = await whisper(audioFilePath);
+        if (!req.file) {
+            return res.status(400).json({ error: 'No file uploaded.' });
+        }
+        const audioBuffer = req.file.buffer;
+        const ans = await whisper(audioBuffer);
         console.log('Received note from the frontend:', ans);
         res.json({ message: 'Note saved successfully on the backend.', generatedText: ans });
     } catch (error) {
