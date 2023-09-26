@@ -5,7 +5,7 @@ const cors = require('cors'); // Import the 'cors' middleware
 const express = require('express')
 const fs = require("fs");
 require("dotenv").config();
-const multer = require('multer');
+const tmp = require('tmp');
 const path = require('path');
 
 const app = express();
@@ -119,9 +119,11 @@ app.post('/api/whisper', async (req, res) => {
 });
 async function whisper(audioBuffer) {
     try {
+        const tmpFile = tmp.fileSync({ postfix: '.wav' });
+        await fs.writeFile(tmpFile.name, audioBuffer);
         const response = await openai.audio.transcriptions.create({
             model: 'whisper-1',
-            data: audioBuffer, // Send the audio data as the request body
+            file: fs.createReadStream(tmpFile.name),
         });
 
         // Access the transcription from the response
