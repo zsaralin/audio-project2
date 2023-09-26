@@ -92,7 +92,7 @@ async function createSong(note) {
     try {
         const completion = await openai.completions.create({
             model: "text-davinci-003",
-            prompt : `create a song verse from the following phrase. don't write verse or verse:, please just begin the song: ${note}`,
+            prompt : `create a song verse from the following phrase. don't write verse or verse at the start, please just begin the song: ${note}`,
             max_tokens: 150,
         });
         console.log(completion.choices[0].text);
