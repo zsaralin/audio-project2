@@ -114,10 +114,11 @@ async function createSong(note) {
     }
 }
 app.post('/api/whisper',async (req, res) => {
-        if (!req.file) {
+    console.log('hiiiiiiiiiiiiiiii')
+
+    if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded.' });
         }
-        console.log('hiiiiiiiiiiiiiiii')
         const tempFilePath = path.join(__dirname, 'temp', 'audio.mp3'); // Change the path as needed
         await fs.rename(req.file.path, tempFilePath);
 
