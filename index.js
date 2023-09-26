@@ -10,7 +10,17 @@ const multer = require('multer');
 const app = express();
 const port =  process.env.PORT || 4000;
 // Set up a storage strategy for multer
-const storage = multer.memoryStorage(); // Store the file in memory
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        // Specify the directory where uploaded files should be stored on disk
+        cb(null, 'uploads/'); // You can change the directory as needed
+    },
+    filename: function (req, file, cb) {
+        // Define how uploaded files should be named
+        cb(null, Date.now() + '-' + file.originalname);
+    },
+});
+
 const upload = multer({ storage: storage });
 
 // Use the 'cors' middleware to enable CORS for all routes
@@ -108,8 +118,8 @@ app.post('/api/whisper', upload.single('audioFile'), async (req, res) => {
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded.' });
         }
-        const audioBuffer = req.file.buffer;
-        const ans = await whisper(audioBuffer);
+        const audioFilePath = req.file.path;
+        const ans = await whisper(audioFilePath);
         console.log('Received note from the frontend:', ans);
         res.json({ message: 'Note saved successfully on the backend.', generatedText: ans });
     } catch (error) {
@@ -117,11 +127,11 @@ app.post('/api/whisper', upload.single('audioFile'), async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-async function whisper(audioFilePath) {
+async function whisper(audioBuffer) {
     try {
         const response = await openai.audio.transcriptions.create({
             model: 'whisper-1',
-            file: fs.createReadStream(audioFilePath),
+            file: fs.createReadStream(audioBuffer),
         });
 
         // Access the transcription from the response
