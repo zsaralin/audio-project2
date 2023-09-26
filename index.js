@@ -8,6 +8,7 @@ require("dotenv").config();
 const tmp = require('tmp');
 const path = require('path');
 const multer = require("multer");
+const ffmpeg = require('fluent-ffmpeg');
 
 const app = express();
 const port =  process.env.PORT || 4000;
@@ -113,16 +114,48 @@ async function createSong(note) {
         console.error("Error:", error.message);
     }
 }
-app.post('/api/whisper',upload.single('audioFile'), async (req, res) => {
+app.post('/api/whisper', upload.single('audioFile'), async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: 'No file uploaded.' });
-        }
+    }
 
-        const ans = await whisper(req.file.path);
+    // Specify the output path for the converted WAV file
+    const outputPath = path.join(__dirname, 'uploads', 'audio.wav');
+
+    try {
+        // Use FFmpeg to convert the uploaded file to WAV
+        await convertToWav(req.file.path, outputPath);
+
+        // Process the converted WAV file
+        const ans = await whisper(outputPath);
         console.log('Received note from the frontend:', ans);
 
         res.json({ message: 'Note saved successfully on the backend.', generatedText: ans });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 });
+
+// Function to convert audio file to WAV using FFmpeg
+async function convertToWav(inputPath, outputPath) {
+    return new Promise((resolve, reject) => {
+        const command = ffmpeg()
+            .input(inputPath)
+            .audioCodec('pcm_s16le') // Set the codec for WAV format
+            .toFormat('wav') // Convert to WAV format
+            .on('end', () => {
+                console.log('Conversion to WAV finished');
+                resolve();
+            })
+            .on('error', (err) => {
+                console.error('Error during conversion:', err);
+                reject(err);
+            });
+
+        command.save(outputPath);
+    });
+}
 async function whisper(audioFilePath) {
     try {
         console.log('EHYYYYYY ' + audioFilePath)
