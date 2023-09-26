@@ -11,17 +11,7 @@ const path = require('path');
 const app = express();
 const port =  process.env.PORT || 4000;
 // Set up a storage strategy for multer
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        // Specify the directory where uploaded files should be stored on disk
-        cb(null, path.join(__dirname, '/uploads/'));    },
-    filename: function (req, file, cb) {
-        // Define how uploaded files should be named
-        cb(null, file.originalname);
-    },
-});
 
-const upload = multer({ storage: storage });
 
 // Use the 'cors' middleware to enable CORS for all routes
 app.use(cors());
@@ -113,7 +103,7 @@ async function createSong(note) {
         console.error("Error:", error.message);
     }
 }
-app.post('/api/whisper', upload.single('audioFile'), async (req, res) => {
+app.post('/api/whisper', async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded.' });
