@@ -7,11 +7,21 @@ const fs = require("fs");
 require("dotenv").config();
 const tmp = require('tmp');
 const path = require('path');
+const multer = require("multer");
 
 const app = express();
 const port =  process.env.PORT || 4000;
 // Set up a storage strategy for multer
-
+// Configure Multer to save uploaded files to a specific folder
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/'); // Save files to the 'uploads' folder
+    },
+    filename: (req, file, cb) => {
+        cb(null, 'audio.wav'); // Specify the file name
+    },
+});
+const upload = multer({ storage });
 
 // Use the 'cors' middleware to enable CORS for all routes
 app.use(cors());
@@ -103,27 +113,30 @@ async function createSong(note) {
         console.error("Error:", error.message);
     }
 }
-app.post('/api/whisper', async (req, res) => {
+app.post('/api/whisper', upload.single('audioFile'),async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded.' });
         }
-        const audioBuffer = req.file.buffer;
-        const ans = await whisper(audioBuffer);
+        const tempFilePath = path.join(__dirname, 'temp', 'audio.wav'); // Change the path as needed
+        await fs.rename(req.file.path, tempFilePath);
+
+        const ans = await whisper(tempFilePath);
         console.log('Received note from the frontend:', ans);
+        await fs.unlink(tempFilePath);
+
         res.json({ message: 'Note saved successfully on the backend.', generatedText: ans });
+
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-async function whisper(audioBuffer) {
+async function whisper(audioFilePath) {
     try {
-        const tmpFile = tmp.fileSync({ postfix: '.wav' });
-        await fs.writeFile(tmpFile.name, audioBuffer);
         const response = await openai.audio.transcriptions.create({
             model: 'whisper-1',
-            file: fs.createReadStream(tmpFile.name),
+            file: fs.createReadStream(audioFilePath),
         });
 
         // Access the transcription from the response
